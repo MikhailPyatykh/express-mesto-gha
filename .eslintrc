@@ -1,4 +1,10 @@
 {
   "extends": "airbnb-base",
-  "rules": {"allow": ["foo_", "_bar"], "allowAfterThis": true, "allowAfterSuper": true, "allowAfterThisConstructor": true, "enforceInMethodNames": true }
+  "rules": {
+    "allow": ["foo_", "_bar"],
+    "allowAfterThis": true,
+    "allowAfterSuper": true,
+    "allowAfterThisConstructor": true,
+    "enforceInMethodNames": true
+  }
 }
