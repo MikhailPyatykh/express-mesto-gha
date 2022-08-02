@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/MikhailPyatykh/express-mesto-gha#readme",
   "dependencies": {
+    "dotenv": "^16.0.1",
     "editorconfig": "^0.15.3",
     "eslint": "^8.20.0",
     "eslint-config-airbnb-base": "^15.0.0",
