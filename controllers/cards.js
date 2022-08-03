@@ -44,6 +44,11 @@ module.exports.deleteCard = (req, res) => {
         return res
           .status(404)
           .send({ message: "Пользователь по указанному _id не найден" });
+      }
+      if (err.name === "CastError") {
+        return res
+          .status(400)
+          .send({ message: "Переданы некорректные данные _id" });
       } else {
         return res
           .status(500)
