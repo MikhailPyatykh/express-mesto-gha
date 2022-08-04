@@ -22,16 +22,16 @@ module.exports.getUserById = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "Error") {
-        return res
+        res
           .status(errorStatus.DATA_NOT_FOUND_CODE)
           .send({ message: "Пользователь по указанному _id не найден" });
       }
       if (err.name === "CastError") {
-        return res
+        res
           .status(errorStatus.INCORRECT_DATA_CODE)
           .send({ message: "Переданы некорректные данные _id" });
       } else {
-        return res
+        res
           .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
@@ -46,11 +46,11 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(errorStatus.INCORRECT_DATA_CODE).send({
+        res.status(errorStatus.INCORRECT_DATA_CODE).send({
           message: "Переданы некорректные данные при создании пользователя",
         });
       } else {
-        return res
+        res
           .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
@@ -72,16 +72,16 @@ module.exports.updateUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "Error") {
-        return res
+        res
           .status(errorStatus.DATA_NOT_FOUND_CODE)
           .send({ message: "Пользователь по указанному _id не найден" });
       }
       if (err.name === "ValidationError") {
-        return res.status(errorStatus.INCORRECT_DATA_CODE).send({
+        res.status(errorStatus.INCORRECT_DATA_CODE).send({
           message: "Переданы некорректные данные при обновлении профиля.",
         });
       } else {
-        return res
+        res
           .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
@@ -103,16 +103,16 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "Error") {
-        return res
+        res
           .status(errorStatus.DATA_NOT_FOUND_CODE)
           .send({ message: "Пользователь по указанному _id не найден" });
       }
       if (err.name === "ValidationError") {
-        return res.status(errorStatus.INCORRECT_DATA_CODE).send({
+        res.status(errorStatus.INCORRECT_DATA_CODE).send({
           message: "Переданы некорректные данные при обновлении профиля.",
         });
       } else {
-        return res
+        res
           .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }

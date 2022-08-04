@@ -7,7 +7,6 @@ module.exports.getCards = (req, res) => {
     .then((cards) => res.send({ data: cards }))
     .catch(() =>
       res
-        // .status(errorStatus.DEFAULT_ERROR_CODE)
         .status(errorStatus.DEFAULT_ERROR_CODE)
         .send({ message: `На сервере произошла ошибка: ${err.name}` })
     );
@@ -47,16 +46,16 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === "CastError") {
-        return res
+        res
           .status(errorStatus.INCORRECT_DATA_CODE)
           .send({ message: "Переданы некорректные данные _id" });
       }
       if (err.name === "Error") {
-        return res
+        res
           .status(errorStatus.DATA_NOT_FOUND_CODE)
-          .send({ message: "Пользователь по указанному _id не найден" });
+          .send({ message: "Карточка по указанному _id не найдена" });
       } else {
-        return res
+        res
           .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
