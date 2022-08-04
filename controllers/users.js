@@ -1,12 +1,14 @@
 const User = require("../models/user");
-const router = require("express").Router();
+const errorStatus = require("../utils/errorsStatus");
 
 //Возвращаем всех пользователей
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch((err) => {
-      res.status(500).send({ message: `Произошла ошибка ${err.name}` });
+      res
+        .status(errorStatus.DEFAULT_ERROR_CODE)
+        .send({ message: `Произошла ошибка ${err.name}` });
     });
 };
 
@@ -21,16 +23,16 @@ module.exports.getUserById = (req, res) => {
     .catch((err) => {
       if (err.name === "Error") {
         return res
-          .status(404)
+          .status(errorStatus.DATA_NOT_FOUND_CODE)
           .send({ message: "Пользователь по указанному _id не найден" });
       }
       if (err.name === "CastError") {
         return res
-          .status(400)
+          .status(errorStatus.INCORRECT_DATA_CODE)
           .send({ message: "Переданы некорректные данные _id" });
       } else {
         return res
-          .status(500)
+          .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `Произошла ошибка ${err.name}` });
       }
     });
@@ -44,12 +46,12 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(400).send({
+        return res.status(errorStatus.INCORRECT_DATA_CODE).send({
           message: "Переданы некорректные данные при создании пользователя",
         });
       } else {
         return res
-          .status(500)
+          .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `Произошла ошибка ${err.name}` });
       }
     });
@@ -71,16 +73,16 @@ module.exports.updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === "Error") {
         return res
-          .status(404)
+          .status(errorStatus.DATA_NOT_FOUND_CODE)
           .send({ message: "Пользователь по указанному _id не найден" });
       }
       if (err.name === "ValidationError") {
-        return res.status(400).send({
+        return res.status(errorStatus.INCORRECT_DATA_CODE).send({
           message: "Переданы некорректные данные при обновлении профиля.",
         });
       } else {
         return res
-          .status(500)
+          .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `Произошла ошибка ${err.name}` });
       }
     });
@@ -102,16 +104,16 @@ module.exports.updateAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === "Error") {
         return res
-          .status(404)
+          .status(errorStatus.DATA_NOT_FOUND_CODE)
           .send({ message: "Пользователь по указанному _id не найден" });
       }
       if (err.name === "ValidationError") {
-        return res.status(400).send({
+        return res.status(errorStatus.INCORRECT_DATA_CODE).send({
           message: "Переданы некорректные данные при обновлении профиля.",
         });
       } else {
         return res
-          .status(500)
+          .status(errorStatus.DEFAULT_ERROR_CODE)
           .send({ message: `Произошла ошибка ${err.name}` });
       }
     });

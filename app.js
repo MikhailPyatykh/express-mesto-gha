@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
+const errorStatus = require("./utils/errorsStatus");
 
 const { PORT } = process.env;
 const app = express();
@@ -24,5 +25,7 @@ app.use((req, res, next) => {
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 app.all("*", (req, res) => {
-  res.status(404).send({ message: "Переданы некорректные данные URL" });
+  res
+    .status(errorStatus.DATA_NOT_FOUND_CODE)
+    .send({ message: "Переданы некорректные данные URL" });
 });
