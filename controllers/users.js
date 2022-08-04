@@ -8,7 +8,7 @@ module.exports.getUsers = (req, res) => {
     .catch((err) => {
       res
         .status(errorStatus.DEFAULT_ERROR_CODE)
-        .send({ message: `Произошла ошибка ${err.name}` });
+        .send({ message: `На сервере произошла ошибка ${err.name}` });
     });
 };
 
@@ -33,7 +33,7 @@ module.exports.getUserById = (req, res) => {
       } else {
         return res
           .status(errorStatus.DEFAULT_ERROR_CODE)
-          .send({ message: `Произошла ошибка ${err.name}` });
+          .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
     });
 };
@@ -52,7 +52,7 @@ module.exports.createUser = (req, res) => {
       } else {
         return res
           .status(errorStatus.DEFAULT_ERROR_CODE)
-          .send({ message: `Произошла ошибка ${err.name}` });
+          .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
     });
 };
@@ -83,7 +83,7 @@ module.exports.updateUser = (req, res) => {
       } else {
         return res
           .status(errorStatus.DEFAULT_ERROR_CODE)
-          .send({ message: `Произошла ошибка ${err.name}` });
+          .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
     });
 };
@@ -114,7 +114,7 @@ module.exports.updateAvatar = (req, res) => {
       } else {
         return res
           .status(errorStatus.DEFAULT_ERROR_CODE)
-          .send({ message: `Произошла ошибка ${err.name}` });
+          .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
     });
 };
