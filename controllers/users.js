@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const validator = require("validator");
 const errorStatus = require("../utils/errorsStatus");
 
 //Возвращаем всех пользователей
@@ -40,12 +41,18 @@ module.exports.getUserById = (req, res) => {
 
 //Создаём нового пользователя
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+  User.create({ name, about, avatar, email, password })
+    .then((user) => {
+      if (validator.isEmail(user.email)) {
+        res.send({ data: user });
+      } else {
+        throw new Error();
+      }
+    })
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === "ValidationError" || "Error") {
         res.status(errorStatus.INCORRECT_DATA_CODE).send({
           message: "Переданы некорректные данные при создании пользователя",
         });

@@ -1,4 +1,4 @@
-[![Tests](https://github.com/MikhailPyatykh/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/MikhailPyatykh/express-mesto-gha/actions/workflows/tests-13-sprint.yml)
+[![Tests](https://github.com/MikhailPyatykh/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/MikhailPyatykh/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
 
 # Проектная работа Mesto фронтенд + бэкенд
 
@@ -9,6 +9,7 @@
   - подходы к определению ошибок при взаимодействии клиент-сервер
   - использование кастомных ошибок в JS
   - основы работы с Postman и MongoDB Compass
+  -
 
 Выполнил: Пятых Михаил
 
