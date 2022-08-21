@@ -48,6 +48,7 @@ module.exports.createUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
+      console.log(err.name);
       if (err.name === "ValidationError" || "Error") {
         res.status(errorStatus.INCORRECT_DATA_CODE).send({
           message: "Переданы некорректные данные при создании пользователя",

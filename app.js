@@ -1,10 +1,12 @@
 const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
+const { createUser } = require("./controllers/users");
 const errorStatus = require("./utils/errorsStatus");
 
 const { PORT } = process.env;
 const app = express();
+app.use(express.json());
 
 async function main() {
   await mongoose.connect("mongodb://localhost:27017/mestodb");
@@ -24,6 +26,10 @@ app.use((req, res, next) => {
 
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
+
+// app.post("/signin", login);
+app.post("/signup", createUser);
+
 app.all("*", (req, res) => {
   res
     .status(errorStatus.DATA_NOT_FOUND_CODE)
