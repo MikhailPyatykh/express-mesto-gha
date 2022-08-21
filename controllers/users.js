@@ -1,7 +1,9 @@
 const User = require("../models/user");
 const errorStatus = require("../utils/errorsStatus");
 const bcrypt = require("bcryptjs");
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+
+module.exports.login = (req, res) => {};
 
 //Возвращаем всех пользователей
 module.exports.getUsers = (req, res) => {
