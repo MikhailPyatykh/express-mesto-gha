@@ -1,6 +1,7 @@
 const User = require("../models/user");
-const validator = require("validator");
 const errorStatus = require("../utils/errorsStatus");
+const bcrypt = require("bcryptjs");
+// const jwt = require("jsonwebtoken");
 
 //Возвращаем всех пользователей
 module.exports.getUsers = (req, res) => {
@@ -42,23 +43,30 @@ module.exports.getUserById = (req, res) => {
 //Создаём нового пользователя
 module.exports.createUser = (req, res) => {
   const { name, about, avatar, email, password } = req.body;
-
-  User.create({ name, about, avatar, email, password })
-    .then((user) => {
-      res.send({ data: user });
+  bcrypt.hash(password, 10).then((hash) =>
+    User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash, //записываем хэш в базу
     })
-    .catch((err) => {
-      console.log(err.name);
-      if (err.name === "ValidationError" || "Error") {
-        res.status(errorStatus.INCORRECT_DATA_CODE).send({
-          message: "Переданы некорректные данные при создании пользователя",
-        });
-      } else {
-        res
-          .status(errorStatus.DEFAULT_ERROR_CODE)
-          .send({ message: `На сервере произошла ошибка: ${err.name}` });
-      }
-    });
+      .then((user) => {
+        res.send({ data: user });
+      })
+      .catch((err) => {
+        console.log(err.name);
+        if (err.name === "ValidationError" || "Error") {
+          res.status(errorStatus.INCORRECT_DATA_CODE).send({
+            message: "Переданы некорректные данные при создании пользователя",
+          });
+        } else {
+          res
+            .status(errorStatus.DEFAULT_ERROR_CODE)
+            .send({ message: `На сервере произошла ошибка: ${err.name}` });
+        }
+      })
+  );
 };
 
 //Обновляем профиль
