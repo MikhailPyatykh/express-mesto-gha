@@ -1,7 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
-const { createUser } = require("./controllers/users");
+const { createUser, login } = require("./controllers/users");
 const errorStatus = require("./utils/errorsStatus");
 
 const { PORT } = process.env;
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 
-// app.post("/signin", login);
+app.post("/signin", login);
 app.post("/signup", createUser);
 
 app.all("*", (req, res) => {

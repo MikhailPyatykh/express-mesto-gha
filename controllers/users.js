@@ -2,8 +2,37 @@ const User = require("../models/user");
 const errorStatus = require("../utils/errorsStatus");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { JWT_SECRET, NODE_ENV } = process.env;
 
-module.exports.login = (req, res) => {};
+//Обработка входа пользователя
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email }, "+password")
+    .orFail(() => {
+      throw new Error();
+    })
+    .then((user) =>
+      bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          throw new Error();
+        }
+        const token = jwt.sign(
+          { id: user._id },
+          NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+          { expiresIn: "7d" }
+        );
+        res.send({ jwt: token });
+      })
+    )
+    .catch((err) => {
+      if (err.name === "Error") {
+        res
+          .status(errorStatus.UNAUTHORIZED_ERROR_CODE)
+          .send({ message: "Не корректные данные почты или пароля" });
+      }
+    });
+};
 
 //Возвращаем всех пользователей
 module.exports.getUsers = (req, res) => {
