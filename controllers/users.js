@@ -4,6 +4,35 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET, NODE_ENV } = process.env;
 
+//Создаём нового пользователя
+module.exports.register = (req, res) => {
+  const { name, about, avatar, email, password } = req.body;
+  bcrypt.hash(password, 10).then((hash) =>
+    User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash, //записываем хэш в базу
+    })
+      .then((user) => {
+        res.send({ data: user });
+      })
+      .catch((err) => {
+        console.log(err.name);
+        if (err.name === "ValidationError" || "Error") {
+          res.status(errorStatus.INCORRECT_DATA_CODE).send({
+            message: "Переданы некорректные данные при создании пользователя",
+          });
+        } else {
+          res
+            .status(errorStatus.DEFAULT_ERROR_CODE)
+            .send({ message: `На сервере произошла ошибка: ${err.name}` });
+        }
+      })
+  );
+};
+
 //Обработка входа пользователя
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
@@ -22,7 +51,7 @@ module.exports.login = (req, res) => {
           NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
           { expiresIn: "7d" }
         );
-        res.send({ jwt: token });
+        res.send({ token });
       })
     )
     .catch((err) => {
@@ -69,35 +98,6 @@ module.exports.getUserById = (req, res) => {
           .send({ message: `На сервере произошла ошибка: ${err.name}` });
       }
     });
-};
-
-//Создаём нового пользователя
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar, email, password } = req.body;
-  bcrypt.hash(password, 10).then((hash) =>
-    User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash, //записываем хэш в базу
-    })
-      .then((user) => {
-        res.send({ data: user });
-      })
-      .catch((err) => {
-        console.log(err.name);
-        if (err.name === "ValidationError" || "Error") {
-          res.status(errorStatus.INCORRECT_DATA_CODE).send({
-            message: "Переданы некорректные данные при создании пользователя",
-          });
-        } else {
-          res
-            .status(errorStatus.DEFAULT_ERROR_CODE)
-            .send({ message: `На сервере произошла ошибка: ${err.name}` });
-        }
-      })
-  );
 };
 
 //Обновляем профиль
