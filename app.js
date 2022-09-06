@@ -1,11 +1,37 @@
-const express = require("express");
 require("dotenv").config();
+const express = require("express");
 const mongoose = require("mongoose");
+
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+
+const status = require("./utils/errors");
+
 const { register, login } = require("./controllers/users");
-const errorStatus = require("./utils/errorsStatus");
+
+const {
+  registerValidation,
+  loginValidation,
+} = require("./middlewares/requestsValidation");
+
+const { errors } = require("celebrate");
+
+const { errorsHandler } = require("./middlewares/errorsHandler");
 
 const { PORT } = process.env;
+
 const app = express();
+
+// Apply the rate limiting middleware to all requests
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+app.use(limiter);
+app.use(helmet());
 app.use(express.json());
 
 async function main() {
@@ -17,21 +43,15 @@ async function main() {
 
 main();
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: "62e79d76b574b77a1da2fe01",
-//   };
-//   next();
-// });
-
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
 
-app.post("/signin", login);
-app.post("/signup", register);
+app.post("/signup", registerValidation, register);
+app.post("/signin", loginValidation, login);
 
 app.all("*", (req, res) => {
-  res
-    .status(errorStatus.DATA_NOT_FOUND_CODE)
-    .send({ message: "Переданы некорректные данные URL" });
+  res.send(status.DATA_NOT_FOUND);
 });
+
+app.use(errors());
+app.use(errorsHandler);

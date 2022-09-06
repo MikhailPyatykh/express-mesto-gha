@@ -1,107 +1,103 @@
 const User = require("../models/user");
-const errorStatus = require("../utils/errorsStatus");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET, NODE_ENV } = process.env;
+const status = require("../utils/errors");
 
 //Создаём нового пользователя
-module.exports.register = (req, res) => {
+module.exports.register = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
-  bcrypt.hash(password, 10).then((hash) =>
-    User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash, //записываем хэш в базу
+  User.findOne({ email })
+    .then((email) => {
+      if (email) {
+        throw status.CONFLICT_DATA;
+      }
+      return bcrypt.hash(password, 10);
     })
-      .then((user) => {
-        res.send({ data: user });
+    .then((hash) =>
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash, //записываем хэш в базу
       })
-      .catch((err) => {
-        console.log(err.name);
-        if (err.name === "ValidationError" || "Error") {
-          res.status(errorStatus.INCORRECT_DATA_CODE).send({
-            message: "Переданы некорректные данные при создании пользователя",
-          });
-        } else {
-          res
-            .status(errorStatus.DEFAULT_ERROR_CODE)
-            .send({ message: `На сервере произошла ошибка: ${err.name}` });
-        }
-      })
-  );
+    )
+    .then((user) => {
+      const { name, about, avatar, email } = user;
+      res.send({ data: { name, about, avatar, email } }); //отправляем ответ без данных о пароле
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 //Обработка входа пользователя
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findOne({ email }, "+password")
     .orFail(() => {
-      throw new Error();
+      throw status.UNAUTHORIZED;
     })
     .then((user) =>
       bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          throw new Error();
+          throw status.UNAUTHORIZED;
         }
+        const { _id } = user;
         const token = jwt.sign(
-          { id: user._id },
+          { _id: _id },
           NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
           { expiresIn: "7d" }
         );
+        console.log(token);
         res.send({ token });
       })
     )
     .catch((err) => {
-      if (err.name === "Error") {
-        res
-          .status(errorStatus.UNAUTHORIZED_ERROR_CODE)
-          .send({ message: "Не корректные данные почты или пароля" });
-      }
+      next(err);
     });
 };
 
 //Возвращаем всех пользователей
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch((err) => {
-      res
-        .status(errorStatus.DEFAULT_ERROR_CODE)
-        .send({ message: `На сервере произошла ошибка ${err.name}` });
+      next(err);
+    });
+};
+
+// Возвращаем информацию о текущем пользователе
+module.exports.getUser = (req, res, next) => {
+  console.log(req.user._id);
+  User.findById(req.user._id)
+    .orFail(() => {
+      throw status.DATA_NOT_FOUND;
+    })
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      next(err);
     });
 };
 
 //Возвращаем пользователя по идентификатору
-module.exports.getUserById = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
+module.exports.getUserById = (req, res, next) => {
+  User.findById(req.params.userId)
     .orFail(() => {
-      throw new Error();
+      throw status.DATA_NOT_FOUND;
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "Error") {
-        res
-          .status(errorStatus.DATA_NOT_FOUND_CODE)
-          .send({ message: "Пользователь по указанному _id не найден" });
-      }
-      if (err.name === "CastError") {
-        res
-          .status(errorStatus.INCORRECT_DATA_CODE)
-          .send({ message: "Переданы некорректные данные _id" });
-      } else {
-        res
-          .status(errorStatus.DEFAULT_ERROR_CODE)
-          .send({ message: `На сервере произошла ошибка: ${err.name}` });
-      }
+      next(err);
     });
 };
 
 //Обновляем профиль
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -110,29 +106,16 @@ module.exports.updateUser = (req, res) => {
     { new: true, runValidators: true }
   )
     .orFail(() => {
-      throw new Error();
+      throw status.DATA_NOT_FOUND;
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "Error") {
-        res
-          .status(errorStatus.DATA_NOT_FOUND_CODE)
-          .send({ message: "Пользователь по указанному _id не найден" });
-      }
-      if (err.name === "ValidationError") {
-        res.status(errorStatus.INCORRECT_DATA_CODE).send({
-          message: "Переданы некорректные данные при обновлении профиля.",
-        });
-      } else {
-        res
-          .status(errorStatus.DEFAULT_ERROR_CODE)
-          .send({ message: `На сервере произошла ошибка: ${err.name}` });
-      }
+      next(err);
     });
 };
 
 //Обновляем аватар
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -141,23 +124,10 @@ module.exports.updateAvatar = (req, res) => {
     { new: true, runValidators: true }
   )
     .orFail(() => {
-      throw new Error();
+      throw status.DATA_NOT_FOUND;
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "Error") {
-        res
-          .status(errorStatus.DATA_NOT_FOUND_CODE)
-          .send({ message: "Пользователь по указанному _id не найден" });
-      }
-      if (err.name === "ValidationError") {
-        res.status(errorStatus.INCORRECT_DATA_CODE).send({
-          message: "Переданы некорректные данные при обновлении профиля.",
-        });
-      } else {
-        res
-          .status(errorStatus.DEFAULT_ERROR_CODE)
-          .send({ message: `На сервере произошла ошибка: ${err.name}` });
-      }
+      next(err);
     });
 };
