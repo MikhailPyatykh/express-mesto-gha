@@ -50,7 +50,9 @@ app.post("/signup", registerValidation, register);
 app.post("/signin", loginValidation, login);
 
 app.all("*", (req, res) => {
-  res.send(status.DATA_NOT_FOUND);
+  res
+    .status(status.DATA_NOT_FOUND.statusCode)
+    .send({ message: status.DATA_NOT_FOUND.message });
 });
 
 app.use(errors());
