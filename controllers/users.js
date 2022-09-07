@@ -5,6 +5,8 @@ const User = require('../models/user');
 const { JWT_SECRET, NODE_ENV } = process.env;
 const status = require('../utils/errors');
 
+// Post commit
+
 // Создаём нового пользователя
 module.exports.register = (req, res, next) => {
   const {
