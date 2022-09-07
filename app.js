@@ -35,9 +35,7 @@ app.use(express.json());
 
 async function main() {
   await mongoose.connect('mongodb://localhost:27017/mestodb');
-  console.log('Connected to db');
   await app.listen(PORT);
-  console.log(`App listening on port ${PORT}`);
 }
 
 main();
