@@ -1,7 +1,6 @@
-const { celebrate, Joi } = require("celebrate");
+const { celebrate, Joi } = require('celebrate');
 
-const regExpLink =
-  /https?:\/\/(www.)?[-a-zA-Z0-9@:%._\/\/+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\/\/+.~#?\/\/=])*/;
+const regExpLink = /https?:\/\/(www.)?[-a-zA-Z0-9@:%._//+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_//+.~#?//=])*/;
 
 module.exports.registerValidation = celebrate({
   body: Joi.object().keys({
@@ -40,9 +39,8 @@ module.exports.cardValidation = celebrate({
   }),
 });
 
-module.exports.idValidation = (id) =>
-  celebrate({
-    params: Joi.object().keys({
-      [id]: Joi.string().alphanum().length(24),
-    }),
-  });
+module.exports.idValidation = (id) => celebrate({
+  params: Joi.object().keys({
+    [id]: Joi.string().hex().length(24),
+  }),
+});

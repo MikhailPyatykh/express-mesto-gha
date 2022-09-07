@@ -1,12 +1,15 @@
-const User = require("../models/user");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { JWT_SECRET, NODE_ENV } = process.env;
-const status = require("../utils/errors");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
-//Создаём нового пользователя
+const { JWT_SECRET, NODE_ENV } = process.env;
+const status = require('../utils/errors');
+
+// Создаём нового пользователя
 module.exports.register = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   User.findOne({ email })
     .then((email) => {
       if (email) {
@@ -14,53 +17,51 @@ module.exports.register = (req, res, next) => {
       }
       return bcrypt.hash(password, 10);
     })
-    .then((hash) =>
-      User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash, //записываем хэш в базу
-      })
-    )
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash, // записываем хэш в базу
+    }))
     .then((user) => {
-      const { name, about, avatar, email } = user;
-      res.send({ data: { name, about, avatar, email } }); //отправляем ответ без данных о пароле
+      res.send({
+        data: {
+          name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+        },
+      }); // отправляем ответ без данных о пароле
     })
     .catch((err) => {
       next(err);
     });
 };
 
-//Обработка входа пользователя
+// Обработка входа пользователя
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findOne({ email }, "+password")
+  User.findOne({ email }, '+password')
     .orFail(() => {
       throw status.UNAUTHORIZED;
     })
-    .then((user) =>
-      bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          throw status.UNAUTHORIZED;
-        }
-        const { _id } = user;
-        const token = jwt.sign(
-          { _id: _id },
-          NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
-          { expiresIn: "7d" }
-        );
-        console.log(token);
-        res.send({ token });
-      })
-    )
+    .then((user) => bcrypt.compare(password, user.password).then((matched) => {
+      if (!matched) {
+        throw status.UNAUTHORIZED;
+      }
+      const { _id } = user;
+      const token = jwt.sign(
+        { _id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+    }))
     .catch((err) => {
       next(err);
     });
 };
 
-//Возвращаем всех пользователей
+// Возвращаем всех пользователей
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
@@ -71,7 +72,6 @@ module.exports.getUsers = (req, res, next) => {
 
 // Возвращаем информацию о текущем пользователе
 module.exports.getUser = (req, res, next) => {
-  console.log(req.user._id);
   User.findById(req.user._id)
     .orFail(() => {
       throw status.DATA_NOT_FOUND;
@@ -84,7 +84,7 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
-//Возвращаем пользователя по идентификатору
+// Возвращаем пользователя по идентификатору
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
@@ -96,14 +96,14 @@ module.exports.getUserById = (req, res, next) => {
     });
 };
 
-//Обновляем профиль
+//  Обновляем профиль
 module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .orFail(() => {
       throw status.DATA_NOT_FOUND;
@@ -114,14 +114,14 @@ module.exports.updateUser = (req, res, next) => {
     });
 };
 
-//Обновляем аватар
+//  Обновляем аватар
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
     { avatar },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .orFail(() => {
       throw status.DATA_NOT_FOUND;

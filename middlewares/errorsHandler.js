@@ -1,7 +1,6 @@
-const status = require("../utils/errors");
+const status = require('../utils/errors');
 
 module.exports.errorsHandler = (err, req, res, next) => {
-  console.log("errorsHandler error");
   if (!err.statusCode || !err.error || !err.message) {
     res.status(status.DEFAULT_ERROR.statusCode).send({
       error: status.DEFAULT_ERROR.error,

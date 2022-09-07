@@ -1,5 +1,5 @@
-const Card = require("../models/card");
-const status = require("../utils/errors");
+const Card = require('../models/card');
+const status = require('../utils/errors');
 
 // Возвращаем все карточки
 module.exports.getCards = (req, res, next) => {
@@ -46,7 +46,7 @@ module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(() => {
       throw status.DATA_NOT_FOUND;
@@ -62,7 +62,7 @@ module.exports.deleteLikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(() => {
       throw status.DATA_NOT_FOUND;
