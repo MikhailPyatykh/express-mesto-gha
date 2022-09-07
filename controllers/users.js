@@ -5,27 +5,21 @@ const User = require('../models/user');
 const { JWT_SECRET, NODE_ENV } = process.env;
 const status = require('../utils/errors');
 
-// Post commit
-
 // Создаём нового пользователя
 module.exports.register = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  User.findOne({ email })
-    .then((email) => {
-      if (email) {
-        throw status.CONFLICT_DATA;
-      }
-      return bcrypt.hash(password, 10);
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash, // записываем хэш в базу
+      });
     })
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash, // записываем хэш в базу
-    }))
     .then((user) => {
       res.send({
         data: {
