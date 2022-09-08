@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const { errors } = require('celebrate');
 
 const error = require('./utils/errorsTemplate');
 
@@ -14,7 +15,6 @@ const {
   loginValidation,
 } = require('./middlewares/requestsValidation');
 
-const { celebrateErrorsHandler } = require('./middlewares/celebrateErrorsHandler');
 const { errorsHandler } = require('./middlewares/errorsHandler');
 
 const { PORT } = process.env;
@@ -50,5 +50,5 @@ app.all('*', (req, res, next) => {
   next(error.DATA_NOT_FOUND('Такого URL не существует'));
 });
 
-app.use(celebrateErrorsHandler);
+app.use(errors());
 app.use(errorsHandler);
