@@ -12,7 +12,7 @@ const {
   idValidation,
 } = require('../middlewares/requestsValidation');
 
-const { authorization } = require('../middlewares/authorization');
+const authorization = require('../middlewares/authorization');
 
 router.use(authorization);
 

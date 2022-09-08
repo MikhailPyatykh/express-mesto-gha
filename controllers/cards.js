@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const status = require('../utils/errors');
+const error = require('../utils/errorsTemplate');
 
 // Возвращаем все карточки
 module.exports.getCards = (req, res, next) => {
@@ -17,7 +17,13 @@ module.exports.createCard = (req, res, next) => {
     owner: req.user._id,
   })
     .then((card) => res.send({ data: card }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(error.INCORRECT_DATA('Переданы некорректные данные пользователя, аватара пользователя или профиля'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // Удаляем карточку по идентификатору с проверкой владельца
@@ -26,17 +32,23 @@ module.exports.deleteCard = (req, res, next) => {
 
   Card.findById(cardId)
     .orFail(() => {
-      throw status.DATA_NOT_FOUND;
+      throw error.DATA_NOT_FOUND('Карточка по указанному _id не найдена');
     })
     .then((card) => {
       if (card.owner.toString() === req.user._id) {
-        card.delete();
+        card.remove();
         res.send(card);
       } else {
-        throw status.ACCESS_DENIED;
+        throw error.ACCESS_DENIED('Нельзя просто так взять и удалить чужую карточку');
       }
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(error.INCORRECT_DATA('Переданы некорректные данные _id'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // Ставим карточке лайк
@@ -49,10 +61,16 @@ module.exports.likeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(() => {
-      throw status.DATA_NOT_FOUND;
+      throw error.DATA_NOT_FOUND('Переданный _id карточки не найден');
     })
     .then((card) => res.send({ data: card }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(error.INCORRECT_DATA('Переданы некорректные данные для постановки лайка'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // Удаляем у карточки лайк
@@ -65,8 +83,14 @@ module.exports.deleteLikeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(() => {
-      throw status.DATA_NOT_FOUND;
+      throw error.DATA_NOT_FOUND('Переданный _id карточки не найден');
     })
     .then((card) => res.send({ data: card }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(error.INCORRECT_DATA('Переданы некорректные данные для снятия лайка'));
+      } else {
+        next(err);
+      }
+    });
 };

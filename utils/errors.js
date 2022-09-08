@@ -1,33 +1,27 @@
 const errors = {
   INCORRECT_DATA: {
     statusCode: 400,
-    error: 'Incorrect data',
-    message: 'Correct data required',
+    message: 'Неверные данные',
   },
   UNAUTHORIZED: {
     statusCode: 401,
-    error: 'Authorization failed',
-    message: 'Authorization required',
+    message: 'Необходима авторизация',
   },
   ACCESS_DENIED: {
     statusCode: 403,
-    error: 'Access error',
-    message: 'Access denied',
+    message: 'Доступ запрещён',
   },
   DATA_NOT_FOUND: {
     statusCode: 404,
-    error: 'Data error',
-    message: 'Data not found',
+    message: 'Данные не найдены',
   },
   CONFLICT_DATA: {
     statusCode: 409,
-    error: 'Conflict data error',
-    message: 'Conflict data',
+    message: 'Неверные данные',
   },
   DEFAULT_ERROR: {
     statusCode: 500,
-    error: 'Default error',
-    message: 'An error occurred',
+    message: 'На сервере произошла ошибка',
   },
 };
 

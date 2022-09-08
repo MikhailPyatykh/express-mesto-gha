@@ -3,32 +3,35 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const { JWT_SECRET, NODE_ENV } = process.env;
-const status = require('../utils/errors');
+const error = require('../utils/errorsTemplate');
 
 // Создаём нового пользователя
 module.exports.register = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
+
   bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash, // записываем хэш в базу
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash, // записываем хэш в базу
+    })).then((user) => {
+      res.send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
       });
     })
-    .then((user) => {
-      res.send({
-        data: {
-          name: user.name, about: user.about, avatar: user.avatar, email: user.email,
-        },
-      }); // отправляем ответ без данных о пароле
-    })
     .catch((err) => {
-      next(err);
+      if (err.name === 'ValidationError') {
+        next(error.INCORRECT_DATA('Переданы некорректные данные при создании пользователя'));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -38,11 +41,11 @@ module.exports.login = (req, res, next) => {
 
   User.findOne({ email }, '+password')
     .orFail(() => {
-      throw status.UNAUTHORIZED;
+      throw error.UNAUTHORIZED('Неверный логин или пароль');
     })
     .then((user) => bcrypt.compare(password, user.password).then((matched) => {
       if (!matched) {
-        throw status.UNAUTHORIZED;
+        throw error.UNAUTHORIZED('Неверный логин или пароль');
       }
       const { _id } = user;
       const token = jwt.sign(
@@ -70,7 +73,7 @@ module.exports.getUsers = (req, res, next) => {
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
-      throw status.DATA_NOT_FOUND;
+      throw error.DATA_NOT_FOUND('Пользователь с таким _id не найден');
     })
     .then((user) => {
       res.send(user);
@@ -84,11 +87,15 @@ module.exports.getUser = (req, res, next) => {
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      throw status.DATA_NOT_FOUND;
+      throw error.DATA_NOT_FOUND();
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      next(err);
+      if (err.name === 'CastError') {
+        next(error.INCORRECT_DATA_CODE('Переданы некорректные данные _id'));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -102,11 +109,15 @@ module.exports.updateUser = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      throw status.DATA_NOT_FOUND;
+      throw error.DATA_NOT_FOUND('Пользователь по указанному _id не найден');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      next(err);
+      if (err.name === 'ValidationError') {
+        next(error.INCORRECT_DATA('Переданы некорректные данные при обновлении профиля'));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -120,10 +131,14 @@ module.exports.updateAvatar = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      throw status.DATA_NOT_FOUND;
+      throw error.DATA_NOT_FOUND('Пользователь по указанному _id не найден');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      next(err);
+      if (err.name === 'ValidationError') {
+        next(error.INCORRECT_DATA('Переданы некорректные данные при обновлении профиля'));
+      } else {
+        next(err);
+      }
     });
 };

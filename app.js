@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-const { errors } = require('celebrate');
 const status = require('./utils/errors');
 
 const { register, login } = require('./controllers/users');
@@ -15,6 +14,7 @@ const {
   loginValidation,
 } = require('./middlewares/requestsValidation');
 
+const { celebrateErrorsHandler } = require('./middlewares/celebrateErrorsHandler');
 const { errorsHandler } = require('./middlewares/errorsHandler');
 
 const { PORT } = process.env;
@@ -46,11 +46,9 @@ app.use('/cards', require('./routes/cards'));
 app.post('/signup', registerValidation, register);
 app.post('/signin', loginValidation, login);
 
-app.all('*', (req, res) => {
-  res
-    .status(status.DATA_NOT_FOUND.statusCode)
-    .send({ message: status.DATA_NOT_FOUND.message });
+app.all('*', (req, res, next) => {
+  next(status.DATA_NOT_FOUND);
 });
 
-app.use(errors());
+app.use(celebrateErrorsHandler);
 app.use(errorsHandler);
