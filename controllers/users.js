@@ -87,7 +87,7 @@ module.exports.getUser = (req, res, next) => {
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      throw error.DATA_NOT_FOUND();
+      throw error.DATA_NOT_FOUND('Пользователь с таким _id не найден');
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
