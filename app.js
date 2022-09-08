@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-const status = require('./utils/errors');
+const error = require('./utils/errorsTemplate');
 
 const { register, login } = require('./controllers/users');
 
@@ -47,7 +47,7 @@ app.post('/signup', registerValidation, register);
 app.post('/signin', loginValidation, login);
 
 app.all('*', (req, res, next) => {
-  next(status.DATA_NOT_FOUND);
+  next(error.DATA_NOT_FOUND('Такого URL не существует'));
 });
 
 app.use(celebrateErrorsHandler);
