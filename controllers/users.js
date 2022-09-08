@@ -28,10 +28,7 @@ module.exports.register = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(error.INCORRECT_DATA('Переданы некорректные данные при создании пользователя'));
-      }
-      if (err === 'ValidationError') {
-        next(error.INCORRECT_DATA('Переданы некорректные данные при создании пользователя'));
+        next(error.CONFLICT_DATA('Переданы некорректные данные при создании пользователя'));
       } else {
         next(err);
       }

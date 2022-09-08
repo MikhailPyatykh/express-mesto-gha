@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { errors } = require('celebrate');
+// const { errors } = require('celebrate');
+const { customJoiError } = require('./middlewares/customJoiError');
 
 const error = require('./utils/errorsTemplate');
 
@@ -50,5 +51,6 @@ app.all('*', (req, res, next) => {
   next(error.DATA_NOT_FOUND('Такого URL не существует'));
 });
 
-app.use(errors());
+// app.use(errors());
+app.use(customJoiError);
 app.use(errorsHandler);
