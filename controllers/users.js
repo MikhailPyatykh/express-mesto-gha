@@ -28,13 +28,12 @@ module.exports.register = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(error.INCORRECT_DATA('Переданы некорректные данные при создании пользователя'));
+        return next(error.INCORRECT_DATA('Переданы некорректные данные при создании пользователя'));
       }
       if (err.code === 11000) {
-        next(error.CONFLICT_DATA('Переданы некорректные данные при создании пользователя'));
-      } else {
-        next(err);
+        return next(error.CONFLICT_DATA('Переданы некорректные данные при создании пользователя'));
       }
+      return next(err);
     });
 };
 
@@ -56,20 +55,16 @@ module.exports.login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
-      res.send({ token });
+      return res.send({ token });
     }))
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 // Возвращаем всех пользователей
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 // Возвращаем информацию о текущем пользователе
@@ -81,9 +76,7 @@ module.exports.getUser = (req, res, next) => {
     .then((user) => {
       res.send(user);
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 // Возвращаем пользователя по идентификатору
@@ -95,10 +88,9 @@ module.exports.getUserById = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(error.INCORRECT_DATA_CODE('Переданы некорректные данные _id'));
-      } else {
-        next(err);
+        return next(error.INCORRECT_DATA_CODE('Переданы некорректные данные _id'));
       }
+      return next(err);
     });
 };
 
@@ -117,10 +109,9 @@ module.exports.updateUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(error.INCORRECT_DATA('Переданы некорректные данные при обновлении профиля'));
-      } else {
-        next(err);
+        return next(error.INCORRECT_DATA('Переданы некорректные данные при обновлении профиля'));
       }
+      return next(err);
     });
 };
 
@@ -139,9 +130,8 @@ module.exports.updateAvatar = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(error.INCORRECT_DATA('Переданы некорректные данные при обновлении профиля'));
-      } else {
-        next(err);
+        return next(error.INCORRECT_DATA('Переданы некорректные данные при обновлении профиля'));
       }
+      return next(err);
     });
 };

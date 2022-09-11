@@ -1,10 +1,12 @@
-const error = require('../utils/errorsTemplate');
-
 module.exports.errorsHandler = (err, req, res, next) => {
-  if (!err.statusCode) {
-    res.status(error.DEFAULT_ERROR('На сервере произошла ошибка'));
-  } else {
-    res.status(err.statusCode).send({ message: err.message });
-  }
-  next();
+  const { statusCode = 500, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      // проверяем статус и выставляем сообщение в зависимости от него
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  return next();
 };

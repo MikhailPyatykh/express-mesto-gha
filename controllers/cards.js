@@ -5,7 +5,7 @@ const error = require('../utils/errorsTemplate');
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => next(err));
+    .catch(next);
 };
 
 // Создаём новую карточку
@@ -19,10 +19,9 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(error.INCORRECT_DATA('Переданы некорректные данные пользователя, аватара пользователя или профиля'));
-      } else {
-        next(err);
+        return next(error.INCORRECT_DATA('Переданы некорректные данные пользователя, аватара пользователя или профиля'));
       }
+      return next(err);
     });
 };
 
@@ -43,10 +42,9 @@ module.exports.deleteCard = (req, res, next) => {
     .then((deletedCard) => res.send({ message: `Карточка ${deletedCard._id} удалена` }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(error.INCORRECT_DATA('Переданы некорректные данные _id'));
-      } else {
-        next(err);
+        return next(error.INCORRECT_DATA('Переданы некорректные данные _id'));
       }
+      return next(err);
     });
 };
 
@@ -65,10 +63,9 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(error.INCORRECT_DATA('Переданы некорректные данные для постановки лайка'));
-      } else {
-        next(err);
+        return next(error.INCORRECT_DATA('Переданы некорректные данные для постановки лайка'));
       }
+      return next(err);
     });
 };
 
@@ -87,9 +84,8 @@ module.exports.deleteLikeCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(error.INCORRECT_DATA('Переданы некорректные данные для снятия лайка'));
-      } else {
-        next(err);
+        return next(error.INCORRECT_DATA('Переданы некорректные данные для снятия лайка'));
       }
+      return next(err);
     });
 };

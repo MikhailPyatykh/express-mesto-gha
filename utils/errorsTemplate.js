@@ -28,12 +28,6 @@ class ErrorsTemplate extends Error {
     this.message = message;
     return { statusCode: this.statusCode, message: this.message };
   }
-
-  DEFAULT_ERROR(message) {
-    this.statusCode = 500;
-    this.message = message;
-    return { statusCode: this.statusCode, message: this.message };
-  }
 }
 
 module.exports = new ErrorsTemplate();
