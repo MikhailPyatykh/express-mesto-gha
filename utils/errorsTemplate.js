@@ -29,9 +29,10 @@ class ErrorsTemplate extends Error {
     return { statusCode: this.statusCode, message: this.message };
   }
 
-  DEFAULT_ERROR() {
+  DEFAULT_ERROR(message) {
     this.statusCode = 500;
-    return { statusCode: this.statusCode, message: 'На сервере произошла ошибка.' };
+    this.message = message;
+    return { statusCode: this.statusCode, message: this.message };
   }
 }
 

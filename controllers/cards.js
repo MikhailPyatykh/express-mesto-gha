@@ -36,12 +36,11 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (card.owner.toString() === req.user._id) {
-        card.remove();
-      } else {
-        throw error.ACCESS_DENIED('Нельзя просто так взять и удалить чужую карточку');
+        return card.remove();
       }
+      throw error.ACCESS_DENIED('Нельзя просто так взять и удалить чужую карточку');
     })
-    .then(() => res.send({ message: 'Карточка удалена' }))
+    .then((deletedCard) => res.send({ message: `Карточка ${deletedCard._id} удалена` }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(error.INCORRECT_DATA('Переданы некорректные данные _id'));

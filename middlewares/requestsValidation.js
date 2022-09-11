@@ -1,6 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
-
-const regExpLink = /(https|http):\/\/(www.)?[-a-zA-Z0-9@:%._//+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_//+.~#?//=])*/;
+const regExpLink = require('../utils/constants');
 
 module.exports.registerValidation = celebrate({
   body: Joi.object().keys({

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
+const regExpLink = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -11,8 +11,8 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
-    validation: (link) => {
-      validator.isURL(link);
+    validate: {
+      validator: (link) => regExpLink.test(link),
     },
   },
   owner: {
