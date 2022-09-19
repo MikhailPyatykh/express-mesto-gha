@@ -17,7 +17,7 @@ const {
 
 const { errorsHandler } = require('./middlewares/errorsHandler');
 
-const { PORT } = process.env;
+const PORT = 3000;
 
 const app = express();
 
