@@ -13,4 +13,8 @@ node_modules
 .DS_Store
 .idea
 .vscode
+<<<<<<< HEAD
 .env
+=======
+.env
+>>>>>>> 36c318d2f53ea64add87696f83c21323d428489a
